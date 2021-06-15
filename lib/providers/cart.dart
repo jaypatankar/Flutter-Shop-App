@@ -3,13 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class CardItem {
+class CartItem {
   final String id;
   final String title;
   final int quantity;
   final double price;
 
-  CardItem(
+  CartItem(
       {@required this.id,
       @required this.title,
       @required this.quantity,
@@ -17,9 +17,21 @@ class CardItem {
 }
 
 class Cart with ChangeNotifier {
-  Map<String, CardItem> _items;
-  Map<String, CardItem> get items {
-    return {...items};
+  Map<String, CartItem> _items = {};
+  Map<String, CartItem> get items {
+    return {..._items};
+  }
+
+  int get itemCount {
+    return _items.length;
+  }
+
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   void addItem(
@@ -31,7 +43,7 @@ class Cart with ChangeNotifier {
       // change quantity...
       _items.update(
           productId,
-          (existingCartItem) => CardItem(
+          (existingCartItem) => CartItem(
               id: existingCartItem.id,
               title: existingCartItem.id,
               quantity: existingCartItem.quantity + 1,
@@ -39,11 +51,12 @@ class Cart with ChangeNotifier {
     } else {
       _items.putIfAbsent(
           productId,
-          () => CardItem(
+          () => CartItem(
               id: DateTime.now().toString(),
               title: title,
               price: price,
               quantity: 1));
     }
+    notifyListeners();
   }
 }
